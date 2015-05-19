@@ -1,6 +1,7 @@
 package com.rain.winmine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -21,9 +22,7 @@ public class GameView extends LinearLayout {
 
 	public static Block[][] blocksMap = new Block[Config.ROWS][Config.ROWS]; // 保存每个block的矩阵
 
-	// private static Block emptyBlock = null;
-
-	// 用以保存数值为空的block
+	// private ObjectAnimator animator;
 
 	public GameView(Context context) {
 		super(context);
@@ -67,6 +66,22 @@ public class GameView extends LinearLayout {
 
 	public void startGame() {
 		// TODO Auto-generated method stub
+
+		if (MainActivity.playerClear.isPlaying()) {
+			MainActivity.playerClear.pause();
+			MainActivity.playerClear.seekTo(0);
+		}
+
+		if (MainActivity.playerDie.isPlaying()) {
+			MainActivity.playerDie.pause();
+			MainActivity.playerDie.seekTo(0);
+		}
+
+		if (!MainActivity.playerBGM.isPlaying()) {
+			MainActivity.playerBGM.seekTo(0);
+			MainActivity.playerBGM.start();
+		}
+
 		MainActivity.emoji.setImageResource(R.drawable.smile);
 		MainActivity.time.setBase(SystemClock.elapsedRealtime());
 		MainActivity.time.start();
@@ -96,13 +111,33 @@ public class GameView extends LinearLayout {
 				blocksMap[x][y] = b;
 				blocksMap[x][y].setLocation(x, y);
 				blocksMap[x][y].setClickable(true);
-				// blocksMap[x][y].setMine(Math.random() < 0.25 ? true : false);
+				blocksMap[x][y].fade();
 			}
 		}
-
+		allApear();
 		setMines();
 
 		HAVE_BLOCKS = true;
+
+	}
+
+	private void allApear() {
+		// TODO Auto-generated method stub
+		List<Block> list = new ArrayList<>();
+		for (int x = 0; x < Config.ROWS; x++) {
+			for (int y = 0; y < Config.ROWS; y++) {
+				list.add(blocksMap[x][y]);
+			}
+		}
+
+		Collections.shuffle(list);
+		for (Block b : list) {
+			b.appear();
+			/*
+			 * try { Thread.sleep(200); } catch (InterruptedException e) { //
+			 * TODO Auto-generated catch block e.printStackTrace(); }
+			 */
+		}
 
 	}
 
@@ -169,8 +204,10 @@ public class GameView extends LinearLayout {
 		String[] fin = MainActivity.time.getText().toString().split(":");
 		score = getScore(Integer.parseInt(fin[0]), Integer.parseInt(fin[1]));
 		int lastHigh = MainActivity.sp.getInt("highscore", 0);
-		if (score > lastHigh)
+		if (score > lastHigh) {
 			MainActivity.sp.edit().putInt("highscore", score);
+			MainActivity.highScore.setText(score + "");
+		}
 		return true;
 	}
 

@@ -1,5 +1,8 @@
 package com.rain.winmine;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,9 +38,16 @@ public class Block extends FrameLayout {
 			// TODO Auto-generated method stub
 
 			if (statusNow == STATUS_COVERED) {
+				if (MainActivity.playerOpen.isPlaying()) {
+					MainActivity.playerOpen.pause();
+					MainActivity.playerOpen.seekTo(0);
+				}
+				MainActivity.playerOpen.start();
 				setOpened();
 				coverBack.setAlpha(0);
 				if (isMine) {
+					MainActivity.playerDie.start();
+					MainActivity.playerBGM.pause();
 					MainActivity.vibrator.vibrate(1500);
 					MainActivity.time.stop();
 					GameView.clearAll();
@@ -98,12 +108,14 @@ public class Block extends FrameLayout {
 	private boolean isClickable = true;// 是否可点击
 	private int numberOfSurround;// 周围雷数目，即显示数字
 
-	private TextView number;// 显示数字 。。或者地雷
-	private View uncoverBack;// open背景
+	public TextView number;// 显示数字 。。或者地雷
+	public View uncoverBack;// open背景
 	public View coverBack;// cover背景
 
 	public int x;// 在gameview中的坐标
 	public int y;
+
+	private ObjectAnimator animator;
 
 	private MyOnClickListener listener;
 
@@ -230,6 +242,8 @@ public class Block extends FrameLayout {
 	}
 
 	public void win() {
+		MainActivity.playerBGM.pause();
+		MainActivity.playerClear.start();
 		new AlertDialog.Builder(MainActivity.getMainInstance())
 				.setTitle("Congratulations!")
 				.setMessage(
@@ -248,6 +262,33 @@ public class Block extends FrameLayout {
 
 	public void openClick(View v) {
 		listener.onClick(v);
+	}
+
+	// 隐身技
+	public void fade() {
+		coverBack.setAlpha(0);
+		uncoverBack.setAlpha(0);
+		number.setAlpha(0);
+	}
+
+	// 现身
+	public void appear() {
+		animator = ObjectAnimator.ofFloat(this.coverBack, "alpha", 0f, 1f);
+		animator.setStartDelay(x * 150 + y * 150);
+		animator.setDuration(500);
+		animator.addListener(new AnimatorListenerAdapter() {
+
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				// TODO Auto-generated method stub
+				super.onAnimationEnd(animation);
+				uncoverBack.setAlpha(1f);
+				if (numberOfSurround != 0) {
+					number.setAlpha(1f);
+				}
+			}
+		});
+		animator.start();
 	}
 
 }
