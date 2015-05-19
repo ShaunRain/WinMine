@@ -16,7 +16,7 @@ public class GameView extends LinearLayout {
 	private static GameView gameView = null;
 	final static int OH_MINE = 0x11;
 	private boolean HAVE_BLOCKS = false;
-	
+
 	public static int score;
 
 	public static Block[][] blocksMap = new Block[Config.ROWS][Config.ROWS]; // 保存每个block的矩阵
@@ -168,7 +168,9 @@ public class GameView extends LinearLayout {
 		MainActivity.time.stop();
 		String[] fin = MainActivity.time.getText().toString().split(":");
 		score = getScore(Integer.parseInt(fin[0]), Integer.parseInt(fin[1]));
-		MainActivity.sp.edit().putInt("highscore", score);
+		int lastHigh = MainActivity.sp.getInt("highscore", 0);
+		if (score > lastHigh)
+			MainActivity.sp.edit().putInt("highscore", score);
 		return true;
 	}
 
