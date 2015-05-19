@@ -205,7 +205,7 @@ public class GameView extends LinearLayout {
 		score = getScore(Integer.parseInt(fin[0]), Integer.parseInt(fin[1]));
 		int lastHigh = MainActivity.sp.getInt("highscore", 0);
 		if (score > lastHigh) {
-			MainActivity.sp.edit().putInt("highscore", score);
+			MainActivity.sp.edit().putInt("highscore", score).commit();
 			MainActivity.highScore.setText(score + "");
 		}
 		return true;
