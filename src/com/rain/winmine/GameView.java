@@ -7,6 +7,7 @@ import java.util.Random;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
@@ -15,6 +16,8 @@ public class GameView extends LinearLayout {
 	private static GameView gameView = null;
 	final static int OH_MINE = 0x11;
 	private boolean HAVE_BLOCKS = false;
+	
+	public static int score;
 
 	public static Block[][] blocksMap = new Block[Config.ROWS][Config.ROWS]; // 保存每个block的矩阵
 
@@ -65,6 +68,8 @@ public class GameView extends LinearLayout {
 	public void startGame() {
 		// TODO Auto-generated method stub
 		MainActivity.emoji.setImageResource(R.drawable.smile);
+		MainActivity.time.setBase(SystemClock.elapsedRealtime());
+		MainActivity.time.start();
 		if (!HAVE_BLOCKS) {
 			addBlocks(Config.BLOCK_WIDTH, Config.BLOCK_WIDTH);// 初始化所有block
 		} else {
@@ -160,7 +165,18 @@ public class GameView extends LinearLayout {
 					return false;
 			}
 		}
+		MainActivity.time.stop();
+		String[] fin = MainActivity.time.getText().toString().split(":");
+		score = getScore(Integer.parseInt(fin[0]), Integer.parseInt(fin[1]));
+		MainActivity.sp.edit().putInt("highscore", score);
 		return true;
+	}
+
+	/*
+	 * getScore 通过完成时间计算得分，时间越短分数越高
+	 */
+	public static int getScore(int min, int sec) {
+		return (60 - min) * 5 + (60 - sec) * 50;
 	}
 
 	/*
@@ -198,7 +214,7 @@ public class GameView extends LinearLayout {
 				} else {
 					if (blocksMap[i][j].getNumber() == 0) {
 						blocksMap[i][j].openClick(blocksMap[i][j].coverBack);
-						//recBlank(i, j, x, y);
+						// recBlank(i, j, x, y);
 					} else if (++unBlank == 4)
 						return;
 					else

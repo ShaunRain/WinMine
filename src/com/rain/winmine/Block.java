@@ -38,6 +38,8 @@ public class Block extends FrameLayout {
 				setOpened();
 				coverBack.setAlpha(0);
 				if (isMine) {
+					MainActivity.vibrator.vibrate(1500);
+					MainActivity.time.stop();
 					GameView.clearAll();
 					MainActivity.emoji.setImageResource(R.drawable.sad);
 					new AlertDialog.Builder(getContext())
@@ -166,6 +168,7 @@ public class Block extends FrameLayout {
 		this.statusNow = STATUS_FLAGGED;
 		isFlag = true;
 		isClickable = true;
+		MainActivity.vibrator.vibrate(300);
 	}
 
 	public boolean isClickable() {
@@ -228,8 +231,10 @@ public class Block extends FrameLayout {
 
 	public void win() {
 		new AlertDialog.Builder(MainActivity.getMainInstance())
-				.setTitle("Congratulation!")
-				.setMessage("You have finished the game.")
+				.setTitle("Congratulations!")
+				.setMessage(
+						"You have finished the game. With final Score:"
+								+ GameView.score)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 					@Override
