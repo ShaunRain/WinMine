@@ -21,12 +21,21 @@ public class Block extends FrameLayout {
 			// TODO Auto-generated method stub
 			if (statusNow == STATUS_COVERED) {
 				coverBack.setBackgroundResource(R.drawable.square_flag);
+				if (MainActivity.playerFlag.isPlaying()) {
+					MainActivity.playerFlag.pause();
+					MainActivity.playerFlag.seekTo(0);
+				}
+				MainActivity.playerFlag.start();
 				setFlagged();
 				if (GameView.checkGame())
 					win();
 			} else if (statusNow == STATUS_OPENED) {
 				if (numberOfSurround != 0)// 长按不为空的数字block，自动打开没插旗的block
+				{
+					MainActivity.vibrator.vibrate(300);
 					GameView.autoOpen(x, y);
+				}
+
 			}
 			return true;
 		}
@@ -274,7 +283,7 @@ public class Block extends FrameLayout {
 	// 现身
 	public void appear() {
 		animator = ObjectAnimator.ofFloat(this.coverBack, "alpha", 0f, 1f);
-		animator.setStartDelay(x * 150 + y * 150);
+		animator.setStartDelay(x * 100 + y * 100);
 		animator.setDuration(500);
 		animator.addListener(new AnimatorListenerAdapter() {
 
@@ -283,6 +292,7 @@ public class Block extends FrameLayout {
 				// TODO Auto-generated method stub
 				super.onAnimationEnd(animation);
 				uncoverBack.setAlpha(1f);
+				coverBack.setClickable(true);
 				if (numberOfSurround != 0) {
 					number.setAlpha(1f);
 				}

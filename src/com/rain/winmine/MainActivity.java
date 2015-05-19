@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ImageView.ScaleType;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -19,6 +20,7 @@ public class MainActivity extends Activity {
 	static MediaPlayer playerOpen;
 	static MediaPlayer playerDie;
 	static MediaPlayer playerClear;
+	static MediaPlayer playerFlag;
 	/*
 	 * public static int SOUND_DIE = R.raw.mario_die; public static int
 	 * SOUND_OPEN = R.raw.mario_coin; public static int SOUND_WIN =
@@ -27,6 +29,7 @@ public class MainActivity extends Activity {
 
 	public static Vibrator vibrator;
 
+	public static RadioGroup group;
 	public static TextView highScore;
 	public static ImageButton emoji;
 	public static Chronometer time;
@@ -52,6 +55,7 @@ public class MainActivity extends Activity {
 		playerClear = MediaPlayer.create(this, R.raw.mario_clear);
 		playerOpen = MediaPlayer.create(this, R.raw.mario_coin);
 		playerDie = MediaPlayer.create(this, R.raw.mario_die);
+		playerFlag = MediaPlayer.create(this, R.raw.mario_jump);
 
 		vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 		emoji = (ImageButton) findViewById(R.id.emoji);
@@ -68,6 +72,32 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				gameView.startGame();
+			}
+		});
+		group = (RadioGroup) findViewById(R.id.group);
+		group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				switch (checkedId) {
+				case R.id.radio_easy:
+					GameView.MINEMOUNT = 10;
+					GameView.getGameView().startGame();
+					break;
+				case R.id.radio_normal:
+					GameView.MINEMOUNT = 20;
+					GameView.getGameView().startGame();
+					break;
+				case R.id.radio_hard:
+					GameView.MINEMOUNT = 25;
+					GameView.getGameView().startGame();
+					break;
+				case R.id.radio_hell:
+					GameView.MINEMOUNT = 30;
+					GameView.getGameView().startGame();
+					break;
+				}
 			}
 		});
 	}

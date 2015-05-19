@@ -7,7 +7,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal" >
 
         <LinearLayout
@@ -21,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="HighSocre"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="20sp" />
 
             <TextView
@@ -29,6 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="0"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="20sp" />
         </LinearLayout>
 
@@ -52,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/time"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="20sp" />
 
             <Chronometer
@@ -59,6 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
@@ -66,7 +71,37 @@
     <com.rain.winmine.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="0dp"
+        android:layout_weight="8" >
     </com.rain.winmine.GameView>
+
+    <RadioGroup
+        android:id="@+id/group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radio_easy"
+            android:layout_weight="1"
+            android:text="Easy" />
+
+        <RadioButton
+            android:id="@+id/radio_normal"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Normal" />
+
+        <RadioButton
+            android:id="@+id/radio_hard"
+            android:layout_weight="1"
+            android:text="Hard" />
+
+        <RadioButton
+            android:id="@+id/radio_hell"
+            android:layout_weight="1"
+            android:text="Hell" />
+    </RadioGroup>
 
 </LinearLayout>

@@ -13,7 +13,7 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 public class GameView extends LinearLayout {
-	final static int MINEMOUNT = 20;
+	static int MINEMOUNT = 20;
 	private static GameView gameView = null;
 	final static int OH_MINE = 0x11;
 	private boolean HAVE_BLOCKS = false;
@@ -110,7 +110,7 @@ public class GameView extends LinearLayout {
 				// 初始化Block数组，无雷或有雷
 				blocksMap[x][y] = b;
 				blocksMap[x][y].setLocation(x, y);
-				blocksMap[x][y].setClickable(true);
+				blocksMap[x][y].coverBack.setClickable(false);
 				blocksMap[x][y].fade();
 			}
 		}
@@ -215,7 +215,11 @@ public class GameView extends LinearLayout {
 	 * getScore 通过完成时间计算得分，时间越短分数越高
 	 */
 	public static int getScore(int min, int sec) {
-		return (60 - min) * 5 + (60 - sec) * 50;
+		return (60 - min) * 5 + (60 - sec) * 50
+				+ MainActivity.group.getCheckedRadioButtonId() == R.id.radio_easy ? 0
+				: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_normal ? 1000
+						: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_hard ? 2000
+								: 5000;
 	}
 
 	/*
@@ -252,7 +256,9 @@ public class GameView extends LinearLayout {
 						continue;
 				} else {
 					if (blocksMap[i][j].getNumber() == 0) {
-						blocksMap[i][j].openClick(blocksMap[i][j].coverBack);
+						if (blocksMap[i][j].getStatus() != Block.STATUS_FLAGGED)
+							blocksMap[i][j]
+									.openClick(blocksMap[i][j].coverBack);
 						// recBlank(i, j, x, y);
 					} else if (++unBlank == 4)
 						return;
