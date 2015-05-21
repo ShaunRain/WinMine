@@ -2,6 +2,7 @@ package com.rain.winmine;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -89,8 +90,9 @@ public class Block extends FrameLayout {
 									}).show();
 				} else { // not mine
 
-					if (numberOfSurround == 0) {// 用递归找到邻接的空block，open it
-						GameView.recBlank(x, y, x, y);
+					if (numberOfSurround == 0) {// 如果是空，周围全打开
+						//GameView.recBlank(x, y, x, y);
+						GameView.clearAround(x, y);
 					}
 
 					if (GameView.checkGame())
@@ -208,6 +210,10 @@ public class Block extends FrameLayout {
 		return isFlag;
 	}
 
+	public boolean isCover() {
+		return isClickable && !isFlag;
+	}
+
 	/*
 	 * public void open() { coverBack.setAlpha(0); }
 	 */
@@ -250,9 +256,10 @@ public class Block extends FrameLayout {
 		this.y = y;
 	}
 
-	public void win() {
+	public static void win() {
 		MainActivity.playerBGM.pause();
 		MainActivity.playerClear.start();
+		MainActivity.emoji.setImageResource(R.drawable.cool);
 		new AlertDialog.Builder(MainActivity.getMainInstance())
 				.setTitle("Congratulations!")
 				.setMessage(
@@ -299,6 +306,21 @@ public class Block extends FrameLayout {
 			}
 		});
 		animator.start();
+	}
+
+	// mine动画
+	public void blink() {
+		animator = ObjectAnimator.ofFloat(this.number, "alpha", 1f, 0f, 1f);
+
+		ObjectAnimator animator2 = new ObjectAnimator();
+		animator2 = ObjectAnimator
+				.ofFloat(this.number, "rotation", 360, 0, 360);
+
+		AnimatorSet set = new AnimatorSet();
+		set.setDuration(2000);
+		set.setStartDelay(x * 100 + y * 100);
+		set.play(animator).with(animator2);
+		set.start();
 	}
 
 }

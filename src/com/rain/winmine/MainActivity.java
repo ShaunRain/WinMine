@@ -74,6 +74,15 @@ public class MainActivity extends Activity {
 				gameView.startGame();
 			}
 		});
+		emoji.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				Block.win();
+				return true;
+			}
+		});
 		group = (RadioGroup) findViewById(R.id.group);
 		group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
@@ -86,15 +95,15 @@ public class MainActivity extends Activity {
 					GameView.getGameView().startGame();
 					break;
 				case R.id.radio_normal:
-					GameView.MINEMOUNT = 20;
+					GameView.MINEMOUNT = 16;
 					GameView.getGameView().startGame();
 					break;
 				case R.id.radio_hard:
-					GameView.MINEMOUNT = 25;
+					GameView.MINEMOUNT = 21;
 					GameView.getGameView().startGame();
 					break;
 				case R.id.radio_hell:
-					GameView.MINEMOUNT = 30;
+					GameView.MINEMOUNT = 27;
 					GameView.getGameView().startGame();
 					break;
 				}
@@ -108,5 +117,11 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 		if (playerBGM.isPlaying())
 			playerBGM.stop();
+		
+		playerBGM.release();
+		playerOpen.release();
+		playerDie.release();
+		playerClear.release();
+		playerFlag.release();
 	}
 }

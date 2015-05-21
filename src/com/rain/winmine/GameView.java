@@ -1,7 +1,6 @@
 package com.rain.winmine;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -10,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 public class GameView extends LinearLayout {
@@ -123,21 +123,17 @@ public class GameView extends LinearLayout {
 
 	private void allApear() {
 		// TODO Auto-generated method stub
-		List<Block> list = new ArrayList<>();
+		// List<Block> list = new ArrayList<>();
 		for (int x = 0; x < Config.ROWS; x++) {
 			for (int y = 0; y < Config.ROWS; y++) {
-				list.add(blocksMap[x][y]);
+				// list.add(blocksMap[x][y]);
+				blocksMap[x][y].appear();
 			}
 		}
 
-		Collections.shuffle(list);
-		for (Block b : list) {
-			b.appear();
-			/*
-			 * try { Thread.sleep(200); } catch (InterruptedException e) { //
-			 * TODO Auto-generated catch block e.printStackTrace(); }
-			 */
-		}
+		/*
+		 * Collections.shuffle(list); for (Block b : list) { b.appear(); }
+		 */
 
 	}
 
@@ -198,11 +194,16 @@ public class GameView extends LinearLayout {
 			for (int j = 0; j < Config.ROWS; j++) {
 				if (blocksMap[i][j].isMine() && !blocksMap[i][j].isFlag())
 					return false;
+				else if (blocksMap[i][j].isCover())
+					return false;
 			}
 		}
 		MainActivity.time.stop();
 		String[] fin = MainActivity.time.getText().toString().split(":");
+		Log.d("minsec",
+				Integer.parseInt(fin[0]) + ":" + Integer.parseInt(fin[1]));
 		score = getScore(Integer.parseInt(fin[0]), Integer.parseInt(fin[1]));
+
 		int lastHigh = MainActivity.sp.getInt("highscore", 0);
 		if (score > lastHigh) {
 			MainActivity.sp.edit().putInt("highscore", score).commit();
@@ -215,17 +216,25 @@ public class GameView extends LinearLayout {
 	 * getScore 通过完成时间计算得分，时间越短分数越高
 	 */
 	public static int getScore(int min, int sec) {
-		return (60 - min) * 5 + (60 - sec) * 50
-				+ MainActivity.group.getCheckedRadioButtonId() == R.id.radio_easy ? 0
-				: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_normal ? 1000
-						: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_hard ? 2000
-								: 5000;
+		return (60 - min)
+				* 5
+				+ (60 - sec)
+				* 50
+				+ (MainActivity.group.getCheckedRadioButtonId() == R.id.radio_easy ? 0
+						: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_normal ? 1000
+								: MainActivity.group.getCheckedRadioButtonId() == R.id.radio_hard ? 2000
+										: 5000);
 	}
 
 	/*
-	 * open所有与空白block连接的空白block
+	 * open所有与空白block连接的空白block 非常优雅的把问题想复杂了（递归）
 	 */
+	@Deprecated
 	public static void recBlank(int x, int y, int px, int py) {
+		/*
+		 * if(blocksMap[x][y].getNumber()!=0) {
+		 * blocksMap[x][y].openClick(blocksMap[x][y].coverBack); return; }
+		 */
 		int i, j;
 		int unBlank = 0;
 		/*
@@ -255,7 +264,7 @@ public class GameView extends LinearLayout {
 					else
 						continue;
 				} else {
-					if (blocksMap[i][j].getNumber() == 0) {
+					if (blocksMap[i][j].getNumber() != 'M') {
 						if (blocksMap[i][j].getStatus() != Block.STATUS_FLAGGED)
 							blocksMap[i][j]
 									.openClick(blocksMap[i][j].coverBack);
@@ -273,7 +282,22 @@ public class GameView extends LinearLayout {
 	}
 
 	/*
-	 * AoutoOpen : 长按数字block，如果周围插旗数与数字相等，open others
+	 * 如果为空，周围无雷，全开
+	 */
+	public static void clearAround(int x, int y) {
+		for (int i = x - 1; i <= x + 1; i++) {
+			for (int j = y - 1; j <= y + 1; j++) {
+				if (i >= 0 && i < Config.ROWS - 1 && j >= 0
+						&& j < Config.ROWS - 1) {// 没出界
+					if (blocksMap[i][j].getNumber() != 'M')
+						blocksMap[i][j].openClick(blocksMap[i][j].coverBack);
+				}
+			}
+		}
+	}
+
+	/*
+	 * AutoOpen : 长按数字block，如果周围插旗数与数字相等，open others
 	 */
 
 	public static void autoOpen(int x, int y) {
@@ -302,10 +326,18 @@ public class GameView extends LinearLayout {
 	 * clear all covers
 	 */
 	public static void clearAll() {
+		List<Block> listMine = new ArrayList<>();
 		for (int x = 0; x < Config.ROWS; x++) {
-			for (int y = 0; y < Config.ROWS; y++)
+			for (int y = 0; y < Config.ROWS; y++) {
+				if (blocksMap[x][y].isMine())
+					listMine.add(blocksMap[x][y]);
 				blocksMap[x][y].coverBack.setAlpha(0);
+			}
 		}
+
+		for (Block b : listMine)
+			b.blink();
+
 	}
 
 	/*
